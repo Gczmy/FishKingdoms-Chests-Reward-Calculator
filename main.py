@@ -262,22 +262,23 @@ class Score:
         """
         reward_score = 0
         needed_score = self.__needed_score  # 开满奖励所需要的总积分（宝箱积分+奖励积分）
-        needed_box_score = 0
         step = self.__open_step
         open_target = get_open_target_score(step) - self.__open_rest_score
-        score = 0
-        reward = 0
-        while score < needed_score:
+        box_score = 0
+        step_score = 0
+        all_score = 0
+        while all_score < needed_score:
             if needed_score < open_target:
                 break
-            score += open_target
-            reward_score += reward
-            reward, step, open_target, bronze, gold, platinum = self.__get_reward_step_parameters(step)
-        needed_box_score = score - reward_score  # 开满奖励所需要的宝箱积分
-        print(needed_score)
-        print(reward_score)
-        print(score)
-        return needed_box_score
+            box_score += 1
+            step_score += 1
+            if step_score >= open_target:
+                step_score -= open_target
+                reward, step, open_target, bronze, gold, platinum = self.__get_reward_step_parameters(step)
+                reward_score += reward
+                step_score += reward  # 奖励的箱子所开的分数也计入开箱进度中
+            all_score = box_score + reward_score
+        return box_score
 
     def print(self):
         print(f"当前宝箱积分: {self.box_score},",
@@ -296,7 +297,5 @@ class Score:
               f"\n距离下一轮还需宝箱积分: {self.needed_box_score}")
 
 
-fish_king_box_score = Score(init=0, wood=242, bronze=222, gold=3, platinum=3, step="10 青铜宝箱", step_score=1,
-                            open_reward_box=True)
-
+fish_king_box_score = Score(init=0, wood=242, bronze=222, gold=3, platinum=3, step="10 青铜宝箱", step_score=1)
 fish_king_box_score.print()
